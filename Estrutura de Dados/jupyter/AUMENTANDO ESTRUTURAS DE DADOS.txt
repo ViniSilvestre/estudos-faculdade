@@ -1,0 +1,72 @@
+class Node:
+    def __init__(self, key):
+        self.key = key
+        self.left = None
+        self.right = None
+        self.size = 1  # Tamanho total da subárvore enraizada neste nó
+
+
+class OrderStatisticsTree:
+    def __init__(self):
+        self.root = None
+
+    def size(self, node):
+        return node.size if node else 0
+
+    def update_size(self, node):
+        node.size = 1 + self.size(node.left) + self.size(node.right)  # Atualização do tamanho da subárvore
+
+    def insert(self, root, key):
+        if not root:
+            return Node(key)
+
+        if key < root.key:
+            root.left = self.insert(root.left, key)
+        else:
+            root.right = self.insert(root.right, key)
+
+        self.update_size(root)  # Atualização do tamanho da subárvore após a inserção
+        return root
+
+    def insert_key(self, key):
+        self.root = self.insert(self.root, key)
+
+    def print_subtree_sizes(self, node=None):
+        if not node:
+            return
+
+        self.print_subtree_sizes(node.left)
+        print(f"Nó {node.key}: Tamanho da Subárvore = {node.size}")
+        self.print_subtree_sizes(node.right)
+
+    def calculate_mean(self, node=None):
+        if not node:
+            return None, 0, 0
+
+        mean_left, sum_left, count_left = self.calculate_mean(node.left)
+        mean_right, sum_right, count_right = self.calculate_mean(node.right)
+
+        total_elements = count_left + count_right + 1
+        sum_elements = sum_left + sum_right + node.key
+
+        return sum_elements / total_elements, sum_elements, total_elements
+
+    def print_statistics(self):
+        print("Ordem Dinâmica (Tamanhos das Subárvores):")
+        self.print_subtree_sizes(self.root)
+        mean, _, count = self.calculate_mean(self.root)
+        print(f"Média dos Elementos: {mean} (Total de Elementos: {count})")
+
+
+# Exemplo de uso
+order_stat_tree = OrderStatisticsTree()
+
+# Inserindo elementos
+order_stat_tree.insert_key(3)
+order_stat_tree.insert_key(1)
+order_stat_tree.insert_key(5)
+order_stat_tree.insert_key(2)
+order_stat_tree.insert_key(4)
+
+# Imprimindo a ordem dinâmica e a média dos elementos
+order_stat_tree.print_statistics()
